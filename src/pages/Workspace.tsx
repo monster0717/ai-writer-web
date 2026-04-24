@@ -7,6 +7,7 @@ import {
   Info,
   Loader2,
   LogOut,
+  Menu,
   Paperclip,
   PenTool,
   Plus,
@@ -81,6 +82,7 @@ export default function Workspace() {
   
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -299,8 +301,16 @@ export default function Workspace() {
         </div>
       )}
 
+      {/* Sidebar Overlay */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 z-30 md:hidden backdrop-blur-sm transition-opacity"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <div className="w-64 bg-[#141414] border-r border-[#2A2A2A] flex flex-col z-10 shrink-0">
+      <div className={`fixed inset-y-0 left-0 bg-[#141414] border-r border-[#2A2A2A] flex flex-col z-40 w-64 transform transition-transform duration-300 md:relative md:translate-x-0 shrink-0 shadow-2xl md:shadow-none ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-6 border-b border-[#2A2A2A] flex items-center justify-between">
           <h2 className="text-xs uppercase tracking-widest text-[#888] font-semibold">历史爆款记录</h2>
         </div>
@@ -315,7 +325,10 @@ export default function Workspace() {
               histories.map(history => (
                 <div
                   key={history.id}
-                  onClick={() => setActiveHistoryId(history.id)}
+                  onClick={() => {
+                    setActiveHistoryId(history.id);
+                    setIsMobileMenuOpen(false);
+                  }}
                   className={`w-full text-left p-3 rounded cursor-pointer transition-colors border ${
                     activeHistoryId === history.id 
                       ? 'bg-[#222] border-[#333]' 
@@ -357,15 +370,21 @@ export default function Workspace() {
       {/* Main Content */}
       <main className="flex-1 flex flex-col relative min-w-0">
         {/* Header */}
-        <header className="h-16 border-b border-[#2A2A2A] flex items-center justify-between px-8 bg-[#0F0F0F] shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-2 h-2 bg-[#FF5C00] rounded-full"></div>
-            <h1 className="text-lg font-bold tracking-tight italic text-white flex items-center">
+        <header className="h-16 border-b border-[#2A2A2A] flex items-center justify-between px-4 sm:px-8 bg-[#0F0F0F] shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <button 
+              className="md:hidden p-1.5 -ml-1.5 text-[#888] hover:text-white hover:bg-[#222] rounded-md transition-colors"
+              onClick={() => setIsMobileMenuOpen(true)}
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+            <div className="hidden sm:block w-2 h-2 bg-[#FF5C00] rounded-full"></div>
+            <h1 className="text-base sm:text-lg font-bold tracking-tight italic text-white flex items-center">
               爆款写作智能体 <span className="text-[#666] text-xs not-italic font-normal ml-2">v2.4 Pro</span>
-              {activeHistoryId && <span className="text-[10px] uppercase font-normal bg-[#222] px-2 py-1 rounded text-[#FF5C00] border border-[#333] ml-3 tracking-widest">历史快照</span>}
+              {activeHistoryId && <span className="text-[10px] uppercase font-normal bg-[#222] px-2 py-1 rounded text-[#FF5C00] border border-[#333] ml-2 sm:ml-3 tracking-widest hidden sm:inline-block">历史快照</span>}
             </h1>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             {activeHistoryId && (
               <button
                 onClick={() => {
@@ -390,7 +409,7 @@ export default function Workspace() {
         </header>
 
         {/* Workspace */}
-        <div className="flex-1 flex flex-col p-8 gap-6 overflow-hidden">
+        <div className="flex-1 flex flex-col p-4 sm:p-8 gap-4 sm:gap-6 overflow-hidden">
           {/* Input Section */}
           <section className="space-y-4 shrink-0">
             {!activeHistoryId ? (
@@ -428,8 +447,8 @@ export default function Workspace() {
                     </div>
                   )}
 
-                  <div className="grid grid-cols-2 gap-4 h-14">
-                    <div className="relative group h-full">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 sm:h-14">
+                    <div className="relative group h-14 sm:h-full">
                        <input
                         type="file"
                         multiple
@@ -466,7 +485,7 @@ export default function Workspace() {
                         disabled={isGenerating || files.length >= 5}
                         className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer disabled:cursor-not-allowed"
                       />
-                      <div className={`absolute inset-0 bg-[#1A1A1A] border border-[#2A2A2A] p-4 flex items-center justify-between transition-colors overflow-hidden ${files.length >= 5 ? 'opacity-50' : 'group-hover:border-[#444]'}`}>
+                      <div className={`absolute inset-0 bg-[#1A1A1A] border border-[#2A2A2A] p-4 flex items-center justify-between transition-colors overflow-hidden rounded ${files.length >= 5 ? 'opacity-50' : 'group-hover:border-[#444]'}`}>
                         <div className="flex items-center justify-center gap-2 w-full">
                           <Paperclip className="w-5 h-5 text-[#FF5C00] shrink-0" />
                           <span className="text-sm font-bold tracking-widest text-[#888]">上传文件</span>
@@ -476,7 +495,7 @@ export default function Workspace() {
                     <button
                       onClick={generateContent}
                       disabled={isGenerating || !topic.trim()}
-                      className="bg-[#FF5C00] text-black font-black uppercase tracking-widest h-full hover:bg-[#FF7A30] transition-all flex items-center justify-center gap-2 disabled:bg-[#333] disabled:text-[#666] disabled:cursor-not-allowed"
+                      className="bg-[#FF5C00] rounded text-black font-black uppercase tracking-widest h-14 sm:h-full hover:bg-[#FF7A30] transition-all flex items-center justify-center gap-2 disabled:bg-[#333] disabled:text-[#666] disabled:cursor-not-allowed"
                     >
                       <span>立即生成爆款文章</span>
                       <Send className="w-5 h-5" />
@@ -486,7 +505,7 @@ export default function Workspace() {
               </>
             ) : (
               // View mode for active history
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="relative">
                   <label className="text-[10px] uppercase tracking-widest text-[#888] font-bold mb-2 block">当时的话题</label>
                   <div className="w-full bg-[#1A1A1A] border border-[#2A2A2A] p-4 text-lg min-h-[6rem] text-white">
@@ -518,7 +537,7 @@ export default function Workspace() {
               </button>
             </div>
             
-            <div ref={scrollRef} className="flex-1 p-8 overflow-y-auto font-serif leading-relaxed">
+            <div ref={scrollRef} className="flex-1 p-4 sm:p-8 overflow-y-auto font-serif leading-relaxed">
               {displayContent ? (
                 <div className="max-w-2xl mx-auto pb-12">
                    <div className="markdown-body">

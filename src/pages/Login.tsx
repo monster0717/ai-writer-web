@@ -16,8 +16,8 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center font-sans text-[#E5E5E5]">
-      <div className="bg-[#1A1A1A] p-8 rounded border border-[#2A2A2A] w-full max-w-md shadow-2xl">
+    <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center font-sans text-[#E5E5E5] p-4">
+      <div className="bg-[#1A1A1A] p-6 md:p-8 rounded border border-[#2A2A2A] w-full max-w-md shadow-2xl">
         <div className="flex items-center justify-center w-16 h-16 bg-[#222] border border-[#333] rounded mx-auto mb-6">
           <PenTool className="w-8 h-8 text-[#FF5C00]" />
         </div>
